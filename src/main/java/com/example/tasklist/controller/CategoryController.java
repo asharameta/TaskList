@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.tasklist.entity.Category;
 import com.example.tasklist.repository.CategoryRepository;
+import com.example.tasklist.search.CategorySearchValues;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -71,5 +72,10 @@ public class CategoryController {
             return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues){
+        return ResponseEntity.ok(categoryRepository.findByTitle(categorySearchValues.getText()));
     }
 }

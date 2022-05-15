@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.tasklist.entity.Priority;
 import com.example.tasklist.repository.PriorityRepository;
+import com.example.tasklist.search.PrioritySearchValues;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -80,5 +81,10 @@ public class PriorityController {
             return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues){
+        return ResponseEntity.ok(priorityRepository.findByTitle(prioritySearchValues.getText()));
     }
 }
