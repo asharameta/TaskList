@@ -1,5 +1,6 @@
 package com.example.tasklist.controller;
 
+import com.example.tasklist.service.TaskService;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -19,16 +20,18 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/task")
 public class TaskController {
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
-    public TaskController(TaskRepository taskRepository, ConfigurableEnvironment environment) {
-        this.taskRepository = taskRepository;
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Task>> findAll() {
+
         MyLogger.showMethodName("task: findAll() ---------------------------------------------------------------- ");
-        return  ResponseEntity.ok(taskRepository.findAll());
+
+        return ResponseEntity.ok(taskService.findAll());
     }
 
     @PostMapping("/add")
@@ -43,7 +46,7 @@ public class TaskController {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(taskRepository.save(task));
+        return ResponseEntity.ok(taskService.add(task));
     }
 
     @PutMapping("/update")
@@ -58,9 +61,10 @@ public class TaskController {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        taskRepository.save(task);
+        taskService.update(task);
 
         return new ResponseEntity(HttpStatus.OK);
+
     }
 
     @DeleteMapping("/delete/{id}")
@@ -68,10 +72,10 @@ public class TaskController {
         MyLogger.showMethodName("task: delete() ---------------------------------------------------------------- ");
 
         try {
-            taskRepository.deleteById(id);
-        }catch (EmptyResultDataAccessException e){
+            taskService.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
-            return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -81,14 +85,15 @@ public class TaskController {
         MyLogger.showMethodName("task: findById() ---------------------------------------------------------------- ");
 
         Task task = null;
-        try{
-            task = taskRepository.findById(id).get();
-        }catch (NoSuchElementException e){
+
+        try {
+            task = taskService.findById(id);
+        } catch (NoSuchElementException e) {
             e.printStackTrace();
-            return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return  ResponseEntity.ok(task);
+        return ResponseEntity.ok(task);
     }
 
     @PostMapping("/search")
@@ -96,6 +101,7 @@ public class TaskController {
         MyLogger.showMethodName("task: search() ---------------------------------------------------------------- ");
 
         String text = taskSearchValues.getTitle() != null ? taskSearchValues.getTitle() : null;
+
         Integer completed = taskSearchValues.getCompleted() != null ? taskSearchValues.getCompleted() : null;
 
         Long priorityId = taskSearchValues.getPriorityId() != null ? taskSearchValues.getPriorityId() : null;
@@ -108,9 +114,12 @@ public class TaskController {
         Integer pageSize = taskSearchValues.getPageSize() != null ? taskSearchValues.getPageSize() : null;
 
         Sort.Direction direction = sortDirection == null || sortDirection.trim().length() == 0 || sortDirection.trim().equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+
         Sort sort = Sort.by(direction, sortColumn);
+
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-        Page result = taskRepository.findByParams(text, completed, priorityId, categoryId, pageRequest);
+
+        Page result = taskService.findByParams(text, completed, priorityId, categoryId, pageRequest);
 
         return ResponseEntity.ok(result);
     }

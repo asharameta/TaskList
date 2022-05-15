@@ -1,11 +1,11 @@
 package com.example.tasklist.controller;
 
+import com.example.tasklist.service.PriorityService;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.tasklist.entity.Priority;
-import com.example.tasklist.repository.PriorityRepository;
 import com.example.tasklist.search.PrioritySearchValues;
 import com.example.tasklist.util.MyLogger;
 
@@ -15,16 +15,15 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping ("/priority")
 public class PriorityController {
-    private PriorityRepository priorityRepository;
+    private PriorityService priorityService;
 
-    public PriorityController(PriorityRepository priorityRepository) {
-        this.priorityRepository = priorityRepository;
+    public PriorityController(PriorityService priorityService) {
+        this.priorityService = priorityService;
     }
-
     @GetMapping("/all")
     public List<Priority> findAll() {
         MyLogger.showMethodName("PriorityController: findAll() ---------------------------------------------------------- ");
-        return priorityRepository.findAllByOrderByIdAsc();
+        return priorityService.findAll();
     }
 
     @PostMapping("/add")
@@ -43,7 +42,7 @@ public class PriorityController {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(priorityRepository.save(priority));
+        return ResponseEntity.ok(priorityService.add(priority));
     }
 
     @PutMapping("/update")
@@ -62,7 +61,9 @@ public class PriorityController {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(priorityRepository.save(priority));
+        priorityService.update(priority);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping("/id/{id}")
@@ -70,8 +71,9 @@ public class PriorityController {
         MyLogger.showMethodName("PriorityController: findById() ---------------------------------------------------------- ");
 
         Priority priority = null;
+
         try{
-            priority = priorityRepository.findById(id).get();
+            priority = priorityService.findById(id);
         }catch (NoSuchElementException e){
             e.printStackTrace();
             return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
@@ -85,17 +87,18 @@ public class PriorityController {
         MyLogger.showMethodName("PriorityController: delete() ---------------------------------------------------------- ");
 
         try {
-            priorityRepository.deleteById(id);
+            priorityService.deleteById(id);
         }catch (EmptyResultDataAccessException e){
             e.printStackTrace();
             return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
         }
+
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping("/search")
     public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues){
         MyLogger.showMethodName("PriorityController: search() ---------------------------------------------------------- ");
-        return ResponseEntity.ok(priorityRepository.findByTitle(prioritySearchValues.getText()));
+        return ResponseEntity.ok(priorityService.findByTitle(prioritySearchValues.getText()));
     }
 }
