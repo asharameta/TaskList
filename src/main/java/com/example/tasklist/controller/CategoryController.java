@@ -19,11 +19,9 @@ public class CategoryController {
         this.categoryRepository = categoryRepository;
     }
 
-    // just for test: http://localhost:8080/category/test
-    @GetMapping("/test")
-    public List<Category> test() {
-        List<Category> list = categoryRepository.findAll();
-        return list; // JSON формат будет использоваться автоматически
+    @GetMapping("/all")
+    public List<Category> findAll() {
+        return categoryRepository.findAllByOrderByTitleAsc();
     }
 
     @PostMapping("/add")

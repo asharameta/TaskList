@@ -19,11 +19,9 @@ public class PriorityController {
         this.priorityRepository = priorityRepository;
     }
 
-    // just for test: http://localhost:8080/priority/test
-    @GetMapping("/test")
-    public List<Priority> test() {
-        List<Priority> list = priorityRepository.findAll();
-        return list; // JSON
+    @GetMapping("/all")
+    public List<Priority> findAll() {
+        return priorityRepository.findAllByOrderByIdAsc();
     }
 
     @PostMapping("/add")
