@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.tasklist.entity.Stat;
 import com.example.tasklist.repository.StatRepository;
+import com.example.tasklist.util.MyLogger;
 
 @RestController
 public class StatController {
@@ -18,6 +19,7 @@ public class StatController {
 
     @GetMapping("/stat")
     public ResponseEntity<Stat> findById() {
+        MyLogger.showMethodName("StatController: findById() ---------------------------------------------------------- ");
         return  ResponseEntity.ok(statRepository.findById(defaultId).get());
     }
 }
