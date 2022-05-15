@@ -1,7 +1,5 @@
 package com.example.tasklist.controller;
 
-import com.example.tasklist.service.TaskService;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.tasklist.entity.Task;
-import com.example.tasklist.repository.TaskRepository;
 import com.example.tasklist.search.TaskSearchValues;
+import com.example.tasklist.service.TaskService;
 import com.example.tasklist.util.MyLogger;
 
 import java.util.List;
@@ -28,7 +26,6 @@ public class TaskController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Task>> findAll() {
-
         MyLogger.showMethodName("task: findAll() ---------------------------------------------------------------- ");
 
         return ResponseEntity.ok(taskService.findAll());
@@ -46,7 +43,7 @@ public class TaskController {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(taskService.add(task));
+        return ResponseEntity.ok(taskService.add(task)); // возвращаем созданный объект со сгенерированным id
     }
 
     @PutMapping("/update")
