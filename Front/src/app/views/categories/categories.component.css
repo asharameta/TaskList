@@ -1,0 +1,73 @@
+.pointer {
+    cursor: pointer;
+}
+
+.edit-category-icon-area {
+    width: 15%;
+    display: inline-block;
+    text-align: left;
+    font-style: 13px;
+}
+
+.category-title {
+    width: 70%;
+    display: inline-block;
+    font-style: 16px;
+}
+
+.edit-category-icon {
+    color: #dadada;
+}
+
+.add-icon {
+    cursor: pointer;
+    font-size: 25px;
+    vertical-align: middle;
+}
+
+span.add-icon-area {
+    width: 15%;
+    display: inline-block;
+    text-align: left;
+}
+
+#categories {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.nav-title {
+    width: 85%;
+    display: inline-block;
+    font-size: 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.search-category-area {
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: #f2f2f2;
+    border-radius: 6px
+}
+
+.search-category-button {
+    margin-left: 10px;
+    font-size: 25px
+}
+
+.uncompleted-count {
+    background-color: #eaeaea;
+    border-radius: 3px;
+    padding: 5px;
+    color: black;
+    width: 15%;
+    display: inline-block;
+    text-align: center;
+}
+
+.all-category-title {
+    width: 85%;
+    display: inline-block;
+    font-size: 16px;
+}

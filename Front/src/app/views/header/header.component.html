@@ -1,0 +1,20 @@
+<div class="container-fluid">
+    <div class="row settings">
+
+
+        <div class="col-10 text-left align-self-top">
+            <p class="navbar-brand">
+                {{categoryName}}
+            </p>
+
+            <p class="link navbar-brand" (click)="onToggleStat()" *ngIf="showStat">Hide stats</p>
+            <p class="link navbar-brand" (click)="onToggleStat()" *ngIf="!showStat">Show stats</p>
+        </div>
+
+        <div class="col-2 text-right align-self-top">
+            <button mat-icon-button class="header-icon" (click)="showSettings()">
+                <mat-icon>settings</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

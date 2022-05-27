@@ -1,0 +1,15 @@
+<mat-dialog-content>
+
+    <p mat-dialog-title class="settings-title with-subtitle">Setting priorities</p>
+    <p class="little subtitle">* The color will immediately appear in the table</p>
+
+
+    <app-priorities (addPriority)="onAddPriority($event)" (deletePriority)="onDeletePriority($event)" (updatePriority)="onUpdatePriority($event)" [priorities]="priorities">
+    </app-priorities>
+
+</mat-dialog-content>
+
+
+<mat-dialog-actions>
+    <button mat-raised-button color="primary" (click)="onClose()">Close</button>
+</mat-dialog-actions>

@@ -1,0 +1,63 @@
+.completed {
+    text-decoration: line-through;
+    color: #797979;
+}
+
+.novalue {
+    color: #b7b7b7;
+}
+
+.col-id {
+    width: 4%;
+    text-align: center;
+}
+
+.col-title {
+    width: 40%;
+}
+
+.col-priority {
+    width: 10%;
+}
+
+.col-category {
+    width: 10%;
+}
+
+.col-color {
+    width: 1% !important;
+}
+
+.col-date {
+    width: 10% !important;
+}
+
+.col-operations {
+    width: 8%;
+}
+
+.col-select {
+    width: 3%;
+}
+
+.delete-icon {
+    cursor: pointer;
+    color: #ea6561;
+    font-size: 18px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.edit-icon {
+    cursor: pointer;
+    color: #9a9a9a;
+    font-size: 18px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.mat-header-cell {
+    font-size: 1.063rem;
+    color: #9c27b0 !important;
+    font-weight: normal;
+}

@@ -1,0 +1,67 @@
+<div class="sidebar" data-color="purple" data-background-color="white">
+    <div class="logo">
+        <span class="nav-title">
+            Categories
+        </span>
+        <span class="add-icon-area">
+            <button mat-icon-button class="add-icon" (click)="openAddDialog()">
+                <mat-icon>add</mat-icon>
+            </button>
+        </span>
+    </div>
+    <div class="sidebar-wrapper">
+        <ul class="nav">
+
+
+            <div class="search-category-area">
+
+                <mat-form-field class="example-full-width">
+                    <input #inputSearchCategory (keydown.escape)="searchCategoryTitle='';search()" (keyup)="search()" [(ngModel)]="searchCategoryTitle" matInput maxlength="256" placeholder="Search categories" />
+
+                    <button (click)="searchCategoryTitle='';search()" *ngIf="inputSearchCategory.value.trim().length>0" aria-label="clear" class="search-category-button size25 gray" mat-button mat-icon-button matSuffix> 
+                        
+                        <mat-icon>clear</mat-icon>
+                    </button>
+
+
+                </mat-form-field>
+            </div>
+
+
+            <li class="nav-item category" (click)="showTaskByCategory(null!)" [class.active]="selectedCategory===null">
+                <a class="nav-link pointer">
+                    <span class="all-category-title">All</span>
+
+                    <span class="uncompleted-count">{{uncompletedTotal}}</span>
+                </a>
+            </li>
+            <div class="line"></div>
+
+            <div *ngIf="categoryMap.size === 0">
+                <p class="not-found"> Nothing found</p>
+            </div>
+
+
+            <li (click)="showTaskByCategory(mapValue.key)" (mouseenter)="showEditIcon(index)" (mouseleave)="showEditIcon(null!)" *ngFor="let mapValue of categoryMap | keyvalue; let index = index" [class.active]="mapValue.key === selectedCategory" class="nav-item pointer">
+                <a class="nav-link">
+
+                    <span class="category-title">{{mapValue.key.title}}</span>
+
+
+                    <span class="edit-category-icon-area">
+
+                        <mat-icon
+                        (click)="$event.stopPropagation(); openEditDialog(mapValue.key)"
+                        *ngIf="indexMouseMove === index"
+                        class="edit-category-icon">edit </mat-icon>
+                    </span>
+
+
+                    <span class="uncompleted-count"> {{mapValue.value}}</span>
+
+
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
