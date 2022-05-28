@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { Tsk } from 'src/app/model/tsk';
+import { Task } from 'src/app/model/task';
 import { DataHandlerService } from 'src/app/service/data-handler.service';
 import { MatTableDataSource } from "@angular/material/table";
 import{ MatPaginator } from "@angular/material/paginator"
@@ -18,7 +18,7 @@ import { operType } from 'src/app/dialog/operType';
 })
 export class TasksComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category', 'operations', 'select'];
-  dataSource!: MatTableDataSource<Tsk>;
+  dataSource!: MatTableDataSource<Task>;
 
   @ViewChild(MatPaginator, { static: false })
   private paginator!: MatPaginator;
@@ -26,10 +26,10 @@ export class TasksComponent implements OnInit, AfterViewInit {
   private sort!: MatSort;
 
   @Output()
-  updateTask = new EventEmitter<Tsk>();
+  updateTask = new EventEmitter<Task>();
 
   @Output()
-  deleteTask = new EventEmitter<Tsk>();
+  deleteTask = new EventEmitter<Task>();
 
   @Output()
   selectCategory = new EventEmitter<Category>();
@@ -44,17 +44,17 @@ export class TasksComponent implements OnInit, AfterViewInit {
   filterByTitle = new EventEmitter<string>();
 
   @Output()
-  addTask = new EventEmitter<Tsk>();
+  addTask = new EventEmitter<Task>();
 
   searchTaskText!: string;
   selectedStatusFilter!: boolean;
   selectedPriorityFilter!: Priority;
   
   priorities!: Priority[];
-  tasks!: Tsk[];
+  tasks!: Task[];
 
   @Input('tasks')
-  set setTasks(tasks: Tsk[]){
+  set setTasks(tasks: Task[]){
     this.tasks=tasks;
     this.fillTable();
   }
@@ -81,11 +81,11 @@ export class TasksComponent implements OnInit, AfterViewInit {
     this.addTableObjects();
   }
 
-  toggleTastCompleted(task: Tsk){
+  toggleTastCompleted(task: Task){
     task.completed=!task.completed;
   }
 
-  getPriorityColor(task: Tsk){
+  getPriorityColor(task: Task){
 
     if(task.completed){
       return '#f8f9fa';
@@ -131,7 +131,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  openEditTaskDialog(task: Tsk){
+  openEditTaskDialog(task: Task){
     const dialogRef = this.dialog.open(EditTaskDialogComponent, {data: [task, "Editing Task", operType.EDIT], autoFocus: false});
 
     dialogRef.afterClosed().subscribe(res=>{
@@ -152,14 +152,14 @@ export class TasksComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      if(res as Tsk){
+      if(res as Task){
         this.updateTask.emit(task);
         return;
       }
     })
   }
 
-  openDeleteDialog(task: Tsk){
+  openDeleteDialog(task: Task){
     const dialogRef=this.dialog.open(ConfirmDialogComponent, {
       maxWidth: '500px',
       data: {dialogTitle: 'Confirm the action', message: `You really want to delete the task: "${task.title}" ?`},
@@ -173,7 +173,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onToggleStatus(task: Tsk){
+  onToggleStatus(task: Task){
     task.completed=!task.completed;
     this.updateTask.emit(task);
   }
@@ -201,7 +201,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
   }
 
   openAddTaskDialog(){
-    const task = new Tsk(null!,'',false,null!,this.selectedCategory);
+    const task = new Task(null!,'',false,null!,this.selectedCategory);
 
     const dialogRef = this.dialog.open(EditTaskDialogComponent, {data: [task, 'Adding a task',operType.ADD]});
 

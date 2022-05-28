@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { concatMap, map, zip } from 'rxjs';
 import { Category } from './model/category';
 import { Priority } from './model/priority';
-import { Tsk } from './model/tsk';
+import { Task } from './model/task';
 import { DataHandlerService } from './service/data-handler.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { DataHandlerService } from './service/data-handler.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  tasks!: Tsk[];
+  tasks!: Task[];
   categories!: Category[];
   priorities!: Priority[];
   title = 'tasklist';
@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
     this.updateTasksAndStat();
   }
 
-  onUpdateTask(task: Tsk){
+  onUpdateTask(task: Task){
     this.dataHandler.updateTask(task).subscribe(()=>{
       this.fillCategories();
 
@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  onDeleteTask(task: Tsk){
+  onDeleteTask(task: Task){
 
     this.dataHandler.deleteTask(task.id).pipe(
       concatMap(t=>{
@@ -66,7 +66,7 @@ export class AppComponent implements OnInit {
           return({t,count});
         }));
       })).subscribe(res=>{
-        const t = res.t as Tsk;
+        const t = res.t as Task;
 
         if(t.category){
         this.categoryMap.set(t.category!, res.count);
@@ -112,12 +112,12 @@ export class AppComponent implements OnInit {
       this.searchTaskText,
       this.statusFilter,
       this.priorityFilter
-      ).subscribe((tasks: Tsk[])=>{
+      ).subscribe((tasks: Task[])=>{
         this.tasks = tasks;
       });
   }
 
-  onAddTask(task: Tsk){
+  onAddTask(task: Task){
     this.dataHandler.addTask(task).pipe(
 
       concatMap(task=>{
@@ -126,7 +126,7 @@ export class AppComponent implements OnInit {
         }));
       }
       )).subscribe(res=>{
-        const t = res.t as Tsk;
+        const t = res.t as Task;
 
         if(t.category){
           this.categoryMap.set(t.category, res.count);

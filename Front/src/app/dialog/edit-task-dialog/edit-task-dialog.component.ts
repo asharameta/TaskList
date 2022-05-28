@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Category } from 'src/app/model/category';
 import { Priority } from 'src/app/model/priority';
-import { Tsk } from 'src/app/model/tsk';
+import { Task } from 'src/app/model/task';
 import { DataHandlerService } from 'src/app/service/data-handler.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { operType } from '../operType';
@@ -15,7 +15,7 @@ import { operType } from '../operType';
 export class EditTaskDialogComponent implements OnInit {
 
   constructor(private dialogRef: MatDialogRef<EditTaskDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private data: [Tsk, string, operType],
+    @Inject(MAT_DIALOG_DATA) private data: [Task, string, operType],
     private dataHandler: DataHandlerService,
     private dialog: MatDialog) { }
 
@@ -23,7 +23,7 @@ export class EditTaskDialogComponent implements OnInit {
     priorities!: Priority[];
 
     dialogTitle!: string;
-    task!: Tsk;
+    task!: Task;
 
     tmpTitle!: string;
     tmpCategory!: Category;

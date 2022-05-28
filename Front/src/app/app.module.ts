@@ -14,6 +14,7 @@ import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import {MatDatepickerModule} from '@angular/material/datepicker'
 import{MatCheckboxModule} from '@angular/material/checkbox'
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { CategoriesComponent } from './views/categories/categories.component';
@@ -29,6 +30,9 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { PrioritiesComponent } from './views/priorities/priorities.component';
 import { SettingsDialogComponent } from './dialog/settings-dialog/settings-dialog.component';
 import { EditPriorityDialogComponent } from './dialog/edit-priority-dialog/edit-priority-dialog.component';
+import { TASK_URL_TOKEN } from './data/dao/impl/task-service.service';
+import { CATEGORY_URL_TOKEN } from './data/dao/impl/category-service.service';
+import { PRIORITY_URL_TOKEN } from './data/dao/impl/priority-service.service';
 
 @NgModule({
   declarations: [
@@ -63,9 +67,22 @@ import { EditPriorityDialogComponent } from './dialog/edit-priority-dialog/edit-
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule, 
-    ColorPickerModule
+    ColorPickerModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [
+    {provide: TASK_URL_TOKEN,
+      useValue: 'http://localhost:8080/task'},
+
+    {provide: CATEGORY_URL_TOKEN,
+      useValue: 'http://localhost:8080/category'},
+
+    {provide: PRIORITY_URL_TOKEN,
+      useValue: 'http://localhost:8080/priority'},
+
+    {provide: TASK_URL_TOKEN,
+      useValue: 'http://localhost:8080/stat'},
+  ],
   entryComponents: [EditTaskDialogComponent,ConfirmDialogComponent, EditCategoryDialogComponent, SettingsDialogComponent, EditPriorityDialogComponent],
   bootstrap: [AppComponent]
 })

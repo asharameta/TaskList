@@ -1,6 +1,8 @@
 import { commonDAO } from "./commonDAO";
 import { stat } from "src/app/model/stat";
+import { Observable } from "rxjs";
 
-export interface statDAO extends commonDAO<stat>{
-    
+export interface statDAO {
+
+    getOverallStat(): Observable<stat>;
 }

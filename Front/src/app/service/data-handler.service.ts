@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { testData } from '../data/testData';
 import { Category } from '../model/category';
-import { Tsk } from '../model/tsk';
-import { taskDAOArray } from '../data/dao/impl/taskDAOArray';
-import { categoryDAOArray } from '../data/dao/impl/categoryDAOArray';
-import { priorityDAOArray } from '../data/dao/impl/priorityDAOArray';
+import { Tsk } from '../model/task';
 import { Priority } from '../model/priority';
 
 @Injectable({

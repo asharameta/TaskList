@@ -1,6 +1,6 @@
 import { Category } from "./category";
 import { Priority } from "./priority";
-export class Tsk {
+export class Task {
     id: number;
     title: string;
     completed: boolean;
