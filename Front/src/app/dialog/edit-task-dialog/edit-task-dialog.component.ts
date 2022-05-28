@@ -3,7 +3,6 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { Category } from 'src/app/model/category';
 import { Priority } from 'src/app/model/priority';
 import { Task } from 'src/app/model/task';
-import { DataHandlerService } from 'src/app/service/data-handler.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { operType } from '../operType';
 
@@ -16,7 +15,6 @@ export class EditTaskDialogComponent implements OnInit {
 
   constructor(private dialogRef: MatDialogRef<EditTaskDialogComponent>,
     @Inject(MAT_DIALOG_DATA) private data: [Task, string, operType],
-    private dataHandler: DataHandlerService,
     private dialog: MatDialog) { }
 
     categories!: Category[];
@@ -41,8 +39,8 @@ export class EditTaskDialogComponent implements OnInit {
     this.tmpPriority = this.task.priority!;
     this.tmpDate = this.task.date!;
 
-    this.dataHandler.getAllCategories().subscribe(items=>this.categories = items);
-    this.dataHandler.getAllPriorities().subscribe(items=>this.priorities = items);
+    //this.dataHandler.getAllCategories().subscribe(items=>this.categories = items);
+    //this.dataHandler.getAllPriorities().subscribe(items=>this.priorities = items);
   }
 
 

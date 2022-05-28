@@ -18,13 +18,16 @@ export class CommonServiceService<T>{
   findById(id: number): Observable<T> {
     return this.httpClient.get<T>(this.url+'/id/'+id);
   }
+
   delete(id: number): Observable<T> {
     return this.httpClient.delete<T>(this.url+'/delete/'+id);
   }
+
   update(t: T): Observable<T> {
-    return this.httpClient.put<T>(this.url+'/update', t)
+    return this.httpClient.put<T>(this.url + '/update', t);
   }
+
   findAll(): Observable<T[]> {
-    return this.httpClient.get<T[]>(this.update+'/all');
+    return this.httpClient.get<T[]>(this.url + '/all');
   }
 }

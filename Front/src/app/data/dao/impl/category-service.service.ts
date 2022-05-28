@@ -16,7 +16,6 @@ export class CategoryServiceService extends CommonServiceService<Category> imple
     super(baseUrl, http);
    }
 
-
   findCategories(categorySearchValues: CategorySearchValues) {
     return this.http.post<Category[]>(this.baseUrl + '/search', categorySearchValues);
   }

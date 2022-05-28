@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions } from '@angular/material/dialog';
+import { CategorySearchValues } from 'src/app/data/dao/search/SearchObjects';
 import { EditCategoryDialogComponent } from 'src/app/dialog/edit-category-dialog/edit-category-dialog.component';
 import { operType } from 'src/app/dialog/operType';
 import { Category } from 'src/app/model/category';
-import { DataHandlerService } from 'src/app/service/data-handler.service';
+import {DialogAction} from 'src/app/object/DialogResult'
 
 @Component({
   selector: 'app-categories',
@@ -12,15 +13,30 @@ import { DataHandlerService } from 'src/app/service/data-handler.service';
 })
 export class CategoriesComponent implements OnInit {
 
-  @Input()
+
   categories!: Category[];
 
-  @Input()
-  uncompletedTotal!: number;
+  filterTitle!: string;
+  filterChanged!: boolean;
 
-  @Input('categoryMap')
-  set setCategoryMap(categoryMap: Map<Category, number>){
-    this.categoryMap=categoryMap;
+  categorySearchValues!: CategorySearchValues;
+
+  @Input('categorySearchValues')
+    set setCategorySearchValues(categorySearchValues: CategorySearchValues) {
+        this.categorySearchValues = categorySearchValues;
+    }
+
+
+  uncompletedCountForCategoryAll!: number;
+
+  @Input('uncompletedCountForCategoryAll')
+  set uncompletedCount(uncompletedCountForCategoryAll: number) {
+      this.uncompletedCountForCategoryAll = uncompletedCountForCategoryAll;
+  }
+
+  @Input('categories')
+  set setCategories(categories: Category[]){
+    this.categories=categories;
   }
 
   @Output()
@@ -33,84 +49,104 @@ export class CategoriesComponent implements OnInit {
   updateCategory = new EventEmitter<Category>();
 
   @Output()
-  addCategory = new EventEmitter<string>();
+  addCategory = new EventEmitter<Category>();
 
   @Output()
-  searchCategory = new EventEmitter<string>();
+  searchCategory = new EventEmitter<CategorySearchValues>();
 
-  @Input()
+
+  @Input('selectedCategory')
+  set setCategory(selectedCategory: Category) {
+      this.selectedCategory = selectedCategory;
+  }
+
   selectedCategory!: Category;
 
-  categoryMap!: Map<Category, number>;
 
   indexMouseMove!: number;
   searchCategoryTitle!: string;
 
-  constructor(private dataHandler: DataHandlerService,  private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
     //this.dataHandler.getAllCategories().subscribe(categories=>this.categories=categories);
   }
 
   showTaskByCategory(category: Category){
-    if(this.selectedCategory === category){
-      return;
-    }
-
-    this.selectedCategory = category;
-
-    this.selectCategory.emit(this.selectedCategory);
-  }
-
-  showEditIcon(index: number){
-    this.indexMouseMove=index;
+  
   }
 
   openEditDialog(category: Category){
     const dialogRef = this.dialog.open(EditCategoryDialogComponent, {
-      data: [category.title, 'Edit Category', operType.EDIT],
+      data: [new Category(category.id, category.title), 'Editing category'],
       width: '400px'
-  });
-
-  dialogRef.afterClosed().subscribe(result => {
-
-      if (result === 'delete') {
-
-          this.deleteCategory.emit(category);
-
-          console.log(this.categoryMap);
-
-          return;
-      }
-
-      if (result as string) {
-          category.title = result as string;
-
-          this.updateCategory.emit(category);
-          return;
-      }
-  });
-    }
-
-    openAddDialog(){
-      const dialogRef = this.dialog.open(EditCategoryDialogComponent, {
-        data: ['', 'Adding a task', operType.ADD],
-        width: '400px'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-            this.addCategory.emit(result as string);
-        }
-    });
-    }
-
-    search(){
-      if(this.searchCategoryTitle==null){
+    dialogRef.afterClosed().subscribe(res=>{
+      if(!res){
         return;
       }
 
-      this.searchCategory.emit(this.searchCategoryTitle);
+      if(res.action === DialogAction.DELETE){
+        this.deleteCategory.emit(category);
+        return;
+      }
+
+      if(res.action === DialogAction.SAVE){
+        this.updateCategory.emit(res.obj as Category);
+        return;
+      }
+
+    })
+
+  }
+
+  openAddDialog(){
+      const dialogRef = this.dialog.open(EditCategoryDialogComponent, {
+        data: [new Category(null!, ''), 'Adding category'],
+        width: '400px'
+      });
+
+      dialogRef.afterClosed().subscribe(res=>{
+        if(!res){
+          return;
+        }
+
+        if(res.action===DialogAction.SAVE){
+          this.addCategory.emit(res.obj as Category);
+        }
+      });
+  }
+
+  search(){
+     this.filterChanged=false;
+
+     if(!this.categorySearchValues){
+       return;
+     }
+
+     this.categorySearchValues.title=this.filterTitle;
+     this.searchCategory.emit(this.categorySearchValues);
+  }
+
+  showEditIcon(index: number) {
+      this.indexMouseMove = index;
+  }
+
+  clearAndSearch(){
+    this.filterTitle =null!;
+    this.search();
+  }
+
+  checkFilterChanged(){
+    this.filterChanged = false;
+
+    if (this.filterTitle !== this.categorySearchValues.title){
+        this.filterChanged = true;
     }
+
+    return this.filterChanged;
+
+  }
 
 }

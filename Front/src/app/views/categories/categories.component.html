@@ -16,12 +16,15 @@
             <div class="search-category-area">
 
                 <mat-form-field class="example-full-width">
-                    <input #inputSearchCategory (keydown.escape)="searchCategoryTitle='';search()" (keyup)="search()" [(ngModel)]="searchCategoryTitle" matInput maxlength="256" placeholder="Search categories" />
+                    <input matInput maxlength="256" placeholder="Поиск категорий" [(ngModel)]="filterTitle" (ngModelChange)="this.checkFilterChanged()" (keydown.escape)="clearAndSearch()" />
 
-                    <button (click)="searchCategoryTitle='';search()" *ngIf="inputSearchCategory.value.trim().length>0" aria-label="clear" class="search-category-button size25 gray" mat-button mat-icon-button matSuffix> 
-                        
-                        <mat-icon>clear</mat-icon>
-                    </button>
+                    <button *ngIf="filterTitle && filterTitle.trim().length > 0" mat-button matSuffix mat-icon-button aria-label="Clear" class="search-category-button" (click)="clearAndSearch()">
+                <mat-icon>clear</mat-icon>
+            </button>
+
+                    <button *ngIf="filterTitle && filterTitle.trim().length > 0" mat-button matSuffix mat-icon-button (click)="search()" [ngClass]="{'blink-button': filterChanged}">
+                <mat-icon>search</mat-icon>
+            </button>
 
 
                 </mat-form-field>
@@ -32,32 +35,32 @@
                 <a class="nav-link pointer">
                     <span class="all-category-title">All</span>
 
-                    <span class="uncompleted-count">{{uncompletedTotal}}</span>
+                    <span class="uncompleted-count">{{uncompletedCountForCategoryAll}}</span>
                 </a>
             </li>
             <div class="line"></div>
 
-            <div *ngIf="categoryMap.size === 0">
+            <div *ngIf="categories && categories.length === 0">
                 <p class="not-found"> Nothing found</p>
             </div>
 
 
-            <li (click)="showTaskByCategory(mapValue.key)" (mouseenter)="showEditIcon(index)" (mouseleave)="showEditIcon(null!)" *ngFor="let mapValue of categoryMap | keyvalue; let index = index" [class.active]="mapValue.key === selectedCategory" class="nav-item pointer">
+            <li (click)="showTaskByCategory(category)" (mouseenter)="showEditIcon(index)" (mouseleave)="showEditIcon(null!)" *ngFor="let category of categories; let index = index" [class.active]="category === selectedCategory" class="nav-item pointer">
                 <a class="nav-link">
 
-                    <span class="category-title">{{mapValue.key.title}}</span>
+                    <span class="category-title">{{category.title}}</span>
 
 
                     <span class="edit-category-icon-area">
 
                         <mat-icon
-                        (click)="$event.stopPropagation(); openEditDialog(mapValue.key)"
+                        (click)="$event.stopPropagation(); openEditDialog(category)"
                         *ngIf="indexMouseMove === index"
                         class="edit-category-icon">edit </mat-icon>
                     </span>
 
 
-                    <span class="uncompleted-count"> {{mapValue.value}}</span>
+                    <span class="uncompleted-count"> {{category.uncompletedCount || 0}}</span>
 
 
                 </a>
