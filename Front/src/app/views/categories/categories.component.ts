@@ -18,16 +18,15 @@ export class CategoriesComponent implements OnInit {
 
   filterTitle!: string;
   filterChanged!: boolean;
+  uncompletedCountForCategoryAll!: number;
 
   categorySearchValues!: CategorySearchValues;
+  
 
   @Input('categorySearchValues')
     set setCategorySearchValues(categorySearchValues: CategorySearchValues) {
         this.categorySearchValues = categorySearchValues;
     }
-
-
-  uncompletedCountForCategoryAll!: number;
 
   @Input('uncompletedCountForCategoryAll')
   set uncompletedCount(uncompletedCountForCategoryAll: number) {
@@ -38,6 +37,13 @@ export class CategoriesComponent implements OnInit {
   set setCategories(categories: Category[]){
     this.categories=categories;
   }
+
+  @Input('selectedCategory')
+  set setCategory(selectedCategory: Category) {
+      this.selectedCategory = selectedCategory;
+  }
+
+
 
   @Output()
   selectCategory = new EventEmitter<Category>();
@@ -55,12 +61,7 @@ export class CategoriesComponent implements OnInit {
   searchCategory = new EventEmitter<CategorySearchValues>();
 
 
-  @Input('selectedCategory')
-  set setCategory(selectedCategory: Category) {
-      this.selectedCategory = selectedCategory;
-  }
-
-  selectedCategory!: Category;
+  selectedCategory: any;
 
 
   indexMouseMove!: number;
@@ -69,10 +70,16 @@ export class CategoriesComponent implements OnInit {
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
-    //this.dataHandler.getAllCategories().subscribe(categories=>this.categories=categories);
   }
 
-  showTaskByCategory(category: Category){
+  showCategory(category: Category){
+
+    if(this.selectedCategory===category){
+      return;
+    }
+
+    this.selectedCategory=category;
+    this.selectCategory.emit(this.selectedCategory);
   
   }
 

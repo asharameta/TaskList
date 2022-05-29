@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Task } from 'src/app/model/task';
 import { MatTableDataSource } from "@angular/material/table";
-import{ MatPaginator } from "@angular/material/paginator"
+import{ MatPaginator, PageEvent } from "@angular/material/paginator"
 import{ MatSort } from "@angular/material/sort"
 import { EditTaskDialogComponent } from 'src/app/dialog/edit-task-dialog/edit-task-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import { ConfirmDialogComponent } from 'src/app/dialog/confirm-dialog/confirm-di
 import { Category } from 'src/app/model/category';
 import { Priority } from 'src/app/model/priority';
 import { operType } from 'src/app/dialog/operType';
+import { TaskSearchValues } from 'src/app/data/dao/search/SearchObjects';
 
 @Component({
   selector: 'app-tasks',
@@ -37,6 +38,9 @@ export class TasksComponent implements OnInit, AfterViewInit {
   filterByPriority = new EventEmitter<Priority>();
 
   @Output()
+  paging = new EventEmitter<PageEvent>();
+
+  @Output()
   filterByStatus = new EventEmitter<boolean>();
 
   @Output()
@@ -48,6 +52,8 @@ export class TasksComponent implements OnInit, AfterViewInit {
   searchTaskText!: string;
   selectedStatusFilter!: boolean;
   selectedPriorityFilter!: Priority;
+
+  taskSearchValues!: TaskSearchValues;
   
   priorities!: Priority[];
   tasks!: Task[];
@@ -55,8 +61,15 @@ export class TasksComponent implements OnInit, AfterViewInit {
   @Input('tasks')
   set setTasks(tasks: Task[]){
     this.tasks=tasks;
-    this.fillTable();
+    this.assignTableSource();
   }
+
+  @Input('taskSearchValues')
+  set setTaskSearchValues(taskSearchValues: TaskSearchValues){
+    this.taskSearchValues=taskSearchValues;
+  }
+
+
 
   @Input('priorities')
   set setPriorities(priorities: Priority[]){
@@ -65,6 +78,9 @@ export class TasksComponent implements OnInit, AfterViewInit {
 
   @Input()
   selectedCategory!: Category;
+
+  @Input()
+  totalTasksFounded!: number;
 
   constructor(private dialog: MatDialog) { }
 
@@ -80,10 +96,6 @@ export class TasksComponent implements OnInit, AfterViewInit {
     this.addTableObjects();
   }
 
-  toggleTastCompleted(task: Task){
-    task.completed=!task.completed;
-  }
-
   getPriorityColor(task: Task){
 
     if(task.completed){
@@ -97,33 +109,12 @@ export class TasksComponent implements OnInit, AfterViewInit {
     return '#fff';
   }
 
-  private fillTable(){
-
+  private assignTableSource(){
     if(!this.dataSource){
       return;
     }
 
     this.dataSource.data = this.tasks;
-
-    this.addTableObjects();
-
-    this.dataSource.sortingDataAccessor = (task, colName) =>{
-      switch(colName){
-        case 'priority': {
-          return task.priority ? task.priority.id : null as any;
-        }
-        case 'category': {
-          return task.category ? task.category?.title : null as any;
-        }
-        case 'date': {
-          return task.date ? task.date : null as any;
-        }
-        case 'title': {
-          return task.title as any;
-        }
-      }
-      return null as any;
-    };
   }
   private addTableObjects(){
     this.dataSource.sort = this.sort;
@@ -131,50 +122,15 @@ export class TasksComponent implements OnInit, AfterViewInit {
   }
 
   openEditTaskDialog(task: Task){
-    const dialogRef = this.dialog.open(EditTaskDialogComponent, {data: [task, "Editing Task", operType.EDIT], autoFocus: false});
-
-    dialogRef.afterClosed().subscribe(res=>{
-
-      if(res === 'delete'){
-        this.deleteTask.emit(task);
-        return;
-      }
-
-      if(res==='complete'){
-        task.completed=true;
-        this.updateTask.emit(task);
-      }
-
-      if(res==='activate'){
-        task.completed=false;
-        this.updateTask.emit(task);
-        return;
-      }
-
-      if(res as Task){
-        this.updateTask.emit(task);
-        return;
-      }
-    })
+   
   }
 
   openDeleteDialog(task: Task){
-    const dialogRef=this.dialog.open(ConfirmDialogComponent, {
-      maxWidth: '500px',
-      data: {dialogTitle: 'Confirm the action', message: `You really want to delete the task: "${task.title}" ?`},
-      autoFocus: false
-    });
-
-    dialogRef.afterClosed().subscribe(res=>{
-      if(res){
-        this.deleteTask.emit(task);
-      }
-    });
+   
   }
 
   onToggleStatus(task: Task){
-    task.completed=!task.completed;
-    this.updateTask.emit(task);
+   
   }
 
   onSelectCategory(category: Category){
@@ -200,14 +156,10 @@ export class TasksComponent implements OnInit, AfterViewInit {
   }
 
   openAddTaskDialog(){
-    const task = new Task(null!,'',false,null!,this.selectedCategory);
+   
+  }
 
-    const dialogRef = this.dialog.open(EditTaskDialogComponent, {data: [task, 'Adding a task',operType.ADD]});
-
-    dialogRef.afterClosed().subscribe(res=>{
-      if(res){
-        this.addTask.emit(task);
-      }
-    });
+  pageChanged(pageEvent: PageEvent){
+    this.paging.emit(pageEvent);
   }
 }

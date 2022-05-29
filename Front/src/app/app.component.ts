@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { concatMap, map, zip } from 'rxjs';
+import { PageEvent } from '@angular/material/paginator';
 import { CategoryServiceService } from './data/dao/impl/category-service.service';
-import { CategorySearchValues } from './data/dao/search/SearchObjects';
+import { TaskServiceService } from './data/dao/impl/task-service.service';
+import { CategorySearchValues, TaskSearchValues } from './data/dao/search/SearchObjects';
 import { Category } from './model/category';
 import { Priority } from './model/priority';
 import { Task } from './model/task';
@@ -15,17 +16,20 @@ export class AppComponent implements OnInit {
 
   
   categories!: Category[];
+  tasks!: Task[];
   title = 'tasklist';
 
   uncompletedCountForCategoryAll!:number;
+  totalTasksFounded!: number;
 
   selectedCategory!: Category;
 
   showStat=true;
 
   categorySearchValues = new CategorySearchValues();
+  taskSearchValues = new TaskSearchValues();
 
-  constructor(private categoryService: CategoryServiceService){
+  constructor(private categoryService: CategoryServiceService, private taskService: TaskServiceService){
 
   }
   ngOnInit(): void {
@@ -37,10 +41,13 @@ export class AppComponent implements OnInit {
     this.onSelectCategory(null!);
   }
 
-  onSelectCategory(categorySearcheValues: CategorySearchValues){
-    // this.selectedCategory = category;
+  onSelectCategory(category: Category){
+     this.selectedCategory = category;
 
-    // this.updateTasksAndStat();
+      this.taskSearchValues.categoryId = category ? category.id : null!;
+
+      this.onSearchTasks(this.taskSearchValues);
+
   }
 
   onUpdateTask(task: Task){
@@ -81,9 +88,14 @@ export class AppComponent implements OnInit {
     });
   }
 
-  onSearchTasks(searchString: string){
-    //this.searchTaskText = searchString;
-    this.updateTasks();
+  onSearchTasks(searchTaskValues: TaskSearchValues){
+    this.taskSearchValues = searchTaskValues;
+
+    this.taskService.findTasks(this.taskSearchValues).subscribe(res=>{
+      this.totalTasksFounded=res.totalElements;
+      this.tasks = res.content;
+    })
+    
   }
 
   onFilterTasksByStatus(status: boolean){
@@ -181,5 +193,19 @@ export class AppComponent implements OnInit {
 
   toggleStat(showStat: boolean){
     this.showStat=showStat;
+  }
+
+  paging(pageEvent: PageEvent){
+    if(this.taskSearchValues.pageSize !== pageEvent.pageSize){
+    this.taskSearchValues.pageNumber = 0;
+    }
+    else{
+      this.taskSearchValues.pageNumber=pageEvent.pageIndex;
+    }
+
+    this.taskSearchValues.pageSize=pageEvent.pageSize;
+    this.taskSearchValues.pageNumber=pageEvent.pageIndex;
+
+    this.onSearchTasks(this.taskSearchValues);
   }
 }

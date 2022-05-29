@@ -33,6 +33,7 @@ import { EditPriorityDialogComponent } from './dialog/edit-priority-dialog/edit-
 import { TASK_URL_TOKEN } from './data/dao/impl/task-service.service';
 import { CATEGORY_URL_TOKEN } from './data/dao/impl/category-service.service';
 import { PRIORITY_URL_TOKEN } from './data/dao/impl/priority-service.service';
+import { STAT_URL_TOKEN } from './data/dao/impl/stat-service.service';
 
 @NgModule({
   declarations: [
@@ -80,7 +81,7 @@ import { PRIORITY_URL_TOKEN } from './data/dao/impl/priority-service.service';
     {provide: PRIORITY_URL_TOKEN,
       useValue: 'http://localhost:8080/priority'},
 
-    {provide: TASK_URL_TOKEN,
+    {provide: STAT_URL_TOKEN,
       useValue: 'http://localhost:8080/stat'},
   ],
   entryComponents: [EditTaskDialogComponent,ConfirmDialogComponent, EditCategoryDialogComponent, SettingsDialogComponent, EditPriorityDialogComponent],

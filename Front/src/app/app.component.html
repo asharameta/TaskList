@@ -12,8 +12,7 @@
                 <!-- <app-stat [totalTasksInCategory]="totalTasksCountInCategory" [completedTasksInCategory]="completedCountInCategory" [uncompletedTasksInCategory]="uncomplitedCountInCategory" [showStat]="showStat"></app-stat> -->
                 <div class="row">
                     <div class="col-md-12">
-                        <!-- <app-tasks [tasks]="tasks" [priorities]="priorities" [selectedCategory]="selectedCategory" (updateTask)="onUpdateTask($event)" (deleteTask)="onDeleteTask($event)" (selectCategory)="onSelectCategory($event)" (addTask)="onAddTask($event)" (filterByStatus)="onFilterTasksByStatus($event)"
-                            (filterByTitle)="onSearchTasks($event)" (filterByPriority)="onFilterTasksByPriority($event)"></app-tasks> -->
+                        <app-tasks [totalTasksFounded]="totalTasksFounded" [tasks]="tasks" [taskSearchValues]="taskSearchValues" (paging)="paging($event)"></app-tasks>
                     </div>
                 </div>
             </div>
