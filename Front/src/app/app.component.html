@@ -9,10 +9,11 @@
         </nav>
         <div class="content">
             <div class="container-fluid">
-                <!-- <app-stat [totalTasksInCategory]="totalTasksCountInCategory" [completedTasksInCategory]="completedCountInCategory" [uncompletedTasksInCategory]="uncomplitedCountInCategory" [showStat]="showStat"></app-stat> -->
+                <app-stat [dash]="dash" [showStat]="showStat"></app-stat>
                 <div class="row">
                     <div class="col-md-12">
-                        <app-tasks [totalTasksFounded]="totalTasksFounded" [tasks]="tasks" [taskSearchValues]="taskSearchValues" (paging)="paging($event)"></app-tasks>
+                        <app-tasks [totalTasksFounded]="totalTasksFounded" [tasks]="tasks" [taskSearchValues]="taskSearchValues" [categories]="categories" [priorities]="priorities" [selectedCategory]="selectedCategory" [showSearch]="showSearch" (paging)="paging($event)" (searchAction)="onSearchTasks($event)"
+                            (selectCategory)="onSelectCategory($event)" (addTask)="onAddTask($event)" (deleteTask)="onDeleteTask($event)" (updateTask)="onUpdateTask($event)" (toggleSearch)="toggleSearch($event)"></app-tasks>
                     </div>
                 </div>
             </div>

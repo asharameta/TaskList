@@ -1,11 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { CategoryServiceService } from './data/dao/impl/category-service.service';
+import { PriorityServiceService } from './data/dao/impl/priority-service.service';
+import { StatServiceService } from './data/dao/impl/stat-service.service';
 import { TaskServiceService } from './data/dao/impl/task-service.service';
 import { CategorySearchValues, TaskSearchValues } from './data/dao/search/SearchObjects';
 import { Category } from './model/category';
 import { Priority } from './model/priority';
+import { stat } from './model/stat';
 import { Task } from './model/task';
+import { DashboardData } from './object/DashBoardData';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +22,7 @@ export class AppComponent implements OnInit {
   
   categories!: Category[];
   tasks!: Task[];
+  priorities!: Priority[];
   title = 'tasklist';
 
   uncompletedCountForCategoryAll!:number;
@@ -25,24 +31,64 @@ export class AppComponent implements OnInit {
   selectedCategory!: Category;
 
   showStat=true;
+  showSearch=true;
+
+  stat!: stat;
+  dash: DashboardData = new DashboardData();
 
   categorySearchValues = new CategorySearchValues();
   taskSearchValues = new TaskSearchValues();
 
-  constructor(private categoryService: CategoryServiceService, private taskService: TaskServiceService){
+  constructor(private categoryService: CategoryServiceService, private statService: StatServiceService, private priorityService: PriorityServiceService, private taskService: TaskServiceService){
+    
+    this.statService.getOverallStat().subscribe((result => {
+      this.stat = result;
+      this.uncompletedCountForCategoryAll = this.stat.uncompletedTotal;
 
+
+      this.fillAllCategories().subscribe(res => {
+          this.categories = res;
+
+          this.selectCategory(this.selectedCategory);
+
+      });
+
+
+  }));
   }
+
+  
   ngOnInit(): void {
-    //this.dataHandler.getAllPriorities().subscribe(priorities=>this.priorities=priorities);
-    //this.dataHandler.getAllCategories().subscribe(categories=>this.categories=categories);
 
-    this.fillAllCategories();
+    this.fillAllPriorities();
+  }
 
-    this.onSelectCategory(null!);
+  selectCategory(category: Category) {
+
+    if (category) {
+        this.fillDashData(category.completedCount, category.uncompletedCount);
+    } else {
+        this.fillDashData(this.stat.completedTotal, this.stat.uncompletedTotal);
+    }
+
+    this.taskSearchValues.pageNumber = 0;
+
+    this.selectedCategory = category;
+
+    this.taskSearchValues.categoryId = category ? category.id : null!;
+
+    this.searchTasks(this.taskSearchValues);
+  }
+
+  fillDashData(completedCount: number, uncompletedCount: number) {
+    this.dash.completedTotal = completedCount;
+    this.dash.uncompletedTotal = uncompletedCount;
   }
 
   onSelectCategory(category: Category){
-     this.selectedCategory = category;
+    this.taskSearchValues.pageNumber = 0;
+
+     this.selectedCategory = category!;
 
       this.taskSearchValues.categoryId = category ? category.id : null!;
 
@@ -50,35 +96,101 @@ export class AppComponent implements OnInit {
 
   }
 
-  onUpdateTask(task: Task){
-    // this.dataHandler.updateTask(task).subscribe(()=>{
-    //   this.fillCategories();
+  searchTasks(searchTaskValues: TaskSearchValues) {
+    this.taskSearchValues = searchTaskValues;
 
-    //   this.updateTasksAndStat();
-    // });
+    this.taskService.findTasks(this.taskSearchValues).subscribe(result => {
+        if (result.totalPages > 0 && this.taskSearchValues.pageNumber >= result.totalPages) {
+            this.taskSearchValues.pageNumber = 0;
+            this.searchTasks(this.taskSearchValues);
+        }
+
+        this.totalTasksFounded = result.totalElements;
+        this.tasks = result.content;
+    });
+
+}
+
+updateCategoryCounter(category: Category) {
+
+  this.categoryService.findById(category.id).subscribe(cat => { 
+
+      this.categories[this.getCategoryIndex(category)] = cat; 
+
+      this.showCategoryDashboard(cat); 
+
+  });
+}
+
+showCategoryDashboard(cat: Category) {
+  if (this.selectedCategory && this.selectedCategory.id === cat.id) {
+      this.fillDashData(cat.completedCount, cat.uncompletedCount);
+  }
+}
+
+  onAddTask(task: Task){
+    this.taskService.add(task).subscribe(() => {
+
+      if (task.category) {
+          this.updateCategoryCounter(task.category); 
+      }
+      this.updateOverallCounter();
+      this.searchTasks(this.taskSearchValues);
+    });
+  }
+
+  updateOverallCounter() {
+
+    this.statService.getOverallStat().subscribe((res => { 
+        this.stat = res; 
+        this.uncompletedCountForCategoryAll = this.stat.uncompletedTotal; 
+
+        if (!this.selectedCategory) { 
+            this.fillDashData(this.stat.completedTotal, this.stat.uncompletedTotal);
+        }
+
+    }));
+
+}
+
+  onUpdateTask(task: Task){
+    this.taskService.update(task).subscribe(() => {
+
+      if (task.oldCategory) { 
+          this.updateCategoryCounter(task.oldCategory); 
+      }
+
+      if (task.category) {
+          this.updateCategoryCounter(task.category);
+      }
+
+      this.updateOverallCounter(); 
+
+      this.searchTasks(this.taskSearchValues);
+
+  });
   }
 
   onDeleteTask(task: Task){
+    this.taskService.delete(task.id).subscribe(() => {
 
-    // this.dataHandler.deleteTask(task.id).pipe(
-    //   concatMap(t=>{
-    //     return this.dataHandler.getUncompletedCountInCategory(t.category!).pipe(map(count=>{
-    //       return({t,count});
-    //     }));
-    //   })).subscribe(res=>{
-    //     const t = res.t as Task;
+      if (task.category) {
+          this.updateCategoryCounter(task.category);
+      }
 
-    //     if(t.category){
-    //     this.categoryMap.set(t.category!, res.count);
-    //     }
+      this.updateOverallCounter();
+      this.searchTasks(this.taskSearchValues);
 
-    //     this.updateTasksAndStat()
-    //   });
+  });
+
+    
   }
 
   onDeleteCategory(category: Category){
     this.categoryService.delete(category.id).subscribe(cat=>{
+      this.selectedCategory = null!;
       this.onSearchCategory(this.categorySearchValues);
+      this.onSelectCategory(this.selectedCategory!);
     });
   }
 
@@ -91,52 +203,22 @@ export class AppComponent implements OnInit {
   onSearchTasks(searchTaskValues: TaskSearchValues){
     this.taskSearchValues = searchTaskValues;
 
+    //this.cookiesUtils.setCookie(this.cookieTaskSearchValues, JSON.stringify(this.taskSearchValues));
+
+
     this.taskService.findTasks(this.taskSearchValues).subscribe(res=>{
+
+      if(res.totalPages>0 && this.taskSearchValues.pageNumber>=res.totalPages){
+        this.taskSearchValues.pageNumber=0;
+        this.onSearchTasks(this.taskSearchValues);
+      }
+
       this.totalTasksFounded=res.totalElements;
       this.tasks = res.content;
     })
     
   }
 
-  onFilterTasksByStatus(status: boolean){
-    //this.statusFilter = status;
-    this.updateTasks();
-  }
-
-  onFilterTasksByPriority(priority: Priority){
-     //this.priorityFilter = priority;
-     this.updateTasks();
-  }
-
-  updateTasks(){
-    // this.dataHandler.searchTasks(
-    //   this.selectedCategory,
-    //   this.searchTaskText,
-    //   this.statusFilter,
-    //   this.priorityFilter
-    //   ).subscribe((tasks: Task[])=>{
-    //     this.tasks = tasks;
-    //   });
-  }
-
-  onAddTask(task: Task){
-    // this.dataHandler.addTask(task).pipe(
-
-    //   concatMap(task=>{
-    //     return this.dataHandler.getUncompletedCountInCategory(task.category!).pipe(map(count=>{
-    //       return ({t: task,count});
-    //     }));
-    //   }
-    //   )).subscribe(res=>{
-    //     const t = res.t as Task;
-
-    //     if(t.category){
-    //       this.categoryMap.set(t.category, res.count);
-    //     }
-
-    //     this.updateTasksAndStat();
-    //   });
-  }
 
   onAddCategory(category: Category){
     this.categoryService.add(category).subscribe(cat=>{
@@ -144,23 +226,14 @@ export class AppComponent implements OnInit {
     });
   }
 
+  fillAllPriorities(){
+    this.priorityService.findAll().subscribe(res=>{
+      this.priorities=res;
+    })
+  }
+
   fillAllCategories(){
-    this.categoryService.findAll().subscribe(result => {
-      this.categories = result;
-  });
-
-    // if(this.categoryMap){
-    //   this.categoryMap.clear();
-    // }
-
-    // console.log(this.categoryMap);
-    // console.log("inside fillcat");
-
-    // this.categories = this.categories.sort((a,b)=>a.title.localeCompare(b.title));
-
-    // this.categories.forEach(cat=>{
-    //   this.dataHandler.getUncompletedCountInCategory(cat).subscribe(count=>this.categoryMap.set(cat, count));
-    // })
+   return this.categoryService.findAll();
   }
 
   onSearchCategory(categorySearcheValues: CategorySearchValues){
@@ -169,30 +242,12 @@ export class AppComponent implements OnInit {
     });
   }
 
-  updateTasksAndStat(): void {
-
-    this.updateTasks();
-
-    this.updateStat();
-  }
-
-  updateStat(): void {
-      // zip(
-      //     this.dataHandler.getTotalCountInCategory(this.selectedCategory),
-      //     this.dataHandler.getCompletedCountInCategory(this.selectedCategory),
-      //     this.dataHandler.getUncompletedCountInCategory(this.selectedCategory),
-      //     this.dataHandler.getUncompletedTotalCount())
-
-      //     .subscribe(array => {
-      //         this.totalTasksCountInCategory= array[0];
-      //         this.completedCountInCategory = array[1];
-      //         this.uncomplitedCountInCategory = array[2];
-      //         this.uncomplitedTotalTasksInCategory = array[3];
-      //     });
-  }
-
   toggleStat(showStat: boolean){
     this.showStat=showStat;
+  }
+
+  toggleSearch(showSearch: boolean){
+    this.showSearch = showSearch;
   }
 
   paging(pageEvent: PageEvent){
@@ -208,4 +263,9 @@ export class AppComponent implements OnInit {
 
     this.onSearchTasks(this.taskSearchValues);
   }
+
+  getCategoryIndex(category: Category): number {
+    const tmpCategory = this.categories.find(t => t.id === category.id);
+    return this.categories.indexOf(tmpCategory!);
+}
 }

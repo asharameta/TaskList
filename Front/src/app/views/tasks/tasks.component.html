@@ -1,55 +1,102 @@
-<div class="row">
-    <div class="col-md-3 col-sm-12">
+<div class="row" *ngIf="showSearch">
+    <div class="col-md-2 col-sm-12">
         <mat-form-field>
-            <input #filterInput (keydown.escape)="searchTaskText=''; onFilterByTitle()" (keyup)="onFilterByTitle()" [(ngModel)]="searchTaskText" matInput placeholder="Search in the current category">
+            <input matInput placeholder="Title" [(ngModel)]="filterTitle" (ngModelChange)="this.checkFilterChanged()" (keydown.escape)="$event.stopPropagation(); filterTitle=''; checkFilterChanged()">
 
-            <button (click)="searchTaskText=''; onFilterByTitle()" *ngIf="filterInput.value.trim().length>0" aria-label="clear" class="clear-icon size25 gray" mat-button mat-icon-button matSuffix> <mat-icon>clear</mat-icon></button>
+            <button (click)="$event.stopPropagation(); filterTitle=''; checkFilterChanged()" *ngIf="filterTitle && filterTitle.trim().length>0" aria-label="clear" class="clear-icon size25 gray" mat-button mat-icon-button matSuffix> <mat-icon>clear</mat-icon></button>
         </mat-form-field>
     </div>
 
 
-    <div class="col-md-3 col-sm-12">
+    <div class="col-md-2 col-sm-12">
         <mat-form-field>
-            <mat-select #statusFilter (valueChange)="onFilterByStatus($event)" [value]="selectedStatusFilter" placeholder="filter by status">
+            <mat-select [(ngModel)]="filterCompleted" (selectionChange)="checkFilterChanged()" placeholder="filter by status">
                 <mat-option [value]="null">all statuses</mat-option>
-                <mat-option [value]="true">Finished tasks</mat-option>
-                <mat-option [value]="false">Unfinished tasks</mat-option>
+                <mat-option [value]="1">Finished tasks</mat-option>
+                <mat-option [value]="0">Unfinished tasks</mat-option>
             </mat-select>
-            <button (click)="$event.stopPropagation(); onFilterByStatus(null!)" *ngIf="selectedStatusFilter !=null" aria-label="clear" class="clear-icon size25 gray" mat-button mat-icon-button matSuffix>
+            <button (click)="$event.stopPropagation(); filterCompleted=null!; checkFilterChanged()" *ngIf="filterCompleted!=null" aria-label="clear" class="clear-icon size25 gray" mat-button mat-icon-button matSuffix>
         <mat-icon>clear</mat-icon>
         </button>
         </mat-form-field>
     </div>
 
 
-    <div class="col-md-3 col-sm-12">
+    <div class="col-md-2 col-sm-12">
         <mat-form-field>
-            <mat-select [value]="selectedPriorityFilter" (valueChange)="onFilterByPriority($event)" placeholder="filter by priority">
+            <mat-select [(ngModel)]="filterPriorityId" (selectionChange)="checkFilterChanged()" placeholder="filter by priority">
                 <mat-option [value]="null"> All priorities</mat-option>
-                <mat-option *ngFor="let priority of priorities" [value]="priority">{{priority.title}}</mat-option>
+                <mat-option *ngFor="let priority of priorities" [value]="priority.id">{{priority.title}}</mat-option>
             </mat-select>
 
-            <button (click)="$event.stopPropagation(); onFilterByPriority(null!)" *ngIf="selectedPriorityFilter != null" aria-label="clear" class="clear-icon size25" mat-button mat-icon-button matSuffix>
+            <button (click)="$event.stopPropagation(); filterPriorityId=null!; checkFilterChanged()" *ngIf="filterPriorityId != null" aria-label="clear" class="clear-icon size25" mat-button mat-icon-button matSuffix>
                 <mat-icon>clear</mat-icon>
             </button>
         </mat-form-field>
     </div>
 
+    <div class="col-md-2 col-sm-12">
+        <mat-form-field>
+            <mat-select [(ngModel)]="filterSortColumn" placeholder="Sorting" (selectionChange)="checkFilterChanged()">
+                <mat-option value='title'>Title</mat-option>
+                <mat-option value='date'>Date</mat-option>
+                <mat-option value='priority'>Priority</mat-option>
+                <mat-option value='category'>Category</mat-option>
+            </mat-select>
 
-    <div class="col-md-3 col-sm-12">
-        <div class="row">
-            <div class="text-left col-6">
-                <button (click)="$event.stopPropagation(); onFilterByStatus(null!); searchTaskText=''; onFilterByTitle()" *ngIf="selectedStatusFilter !=null || (searchTaskText != null && searchTaskText.trim() !='')" aria-label="clear" mat-button matSuffix>Reset Filters</button>
-            </div>
-            <div class="text-right col-6">
-                <button color="primary" mat-raised-button (click)="openAddTaskDialog()">Add</button>
-            </div>
-        </div>
+        </mat-form-field>
+
+    </div>
+
+
+
+    <div class="col-md-4 col-sm-12">
+        <span>Sorting: </span>
+
+        <button matSuffix mat-icon-button mat-button aria-label="sort direction" (click)="$event.stopPropagation(); changedSortDirection(); checkFilterChanged()">
+            <mat-icon>{{this.sortIconName}}</mat-icon>
+        </button>
+
+        <button [ngClass]="{'search-button': true, 'blink-button': changed}" mat-raised-button color="accent" (click)="initSearch()">
+            <mat-icon>search</mat-icon>
+        </button>
+
+        <button matSuffix mat-button aria-label="clear" (click)="$event.stopPropagation(); clearSearchValues(); checkFilterChanged();">Clear</button>
     </div>
 </div>
 
+<div class="gap10">&nbsp;</div>
+
+<div class="row ">
+
+
+    <div class="col-md-2 col-sm-12">
+
+        <button [ngClass]="{'full-width': true}" mat-raised-button color="primary" (click)="openAddDialog()">Add Task
+        </button>
+    </div>
+
+    <div class="col-md-2 col-sm-12 text-left align-middle align-self-center">
+        <span class="link " (click)="onToggleSearch()" *ngIf="showSearch">Hide search</span>
+        <span class="link " (click)="onToggleSearch()" *ngIf="!showSearch">Show search </span>
+    </div>
+
+    <!-- <div class="col-md-8  align-self-center">
+
+        <span class="founded">
+
+            Found tasks: {{totalTasksFounded}}</span>
+
+    </div> -->
+
+
+</div>
+
+<div class="gap20"></div>
+
 
 <div class="com-md12 task-list">
+
     <div class="card">
         <!-- <div class="card-header card-header-warning">
             <h4 class="card-title">Tasks List</h4>
@@ -71,7 +118,7 @@
 
                 <ng-container matColumnDef="title">
                     <th *matHeaderCellDef mat-header-cell mat-sort-header>Title</th>
-                    <td class="col-title pointer" *matCellDef="let task" [class.completed]="task.completed" (click)="openEditTaskDialog(task)" mat-cell>
+                    <td class="col-title pointer" *matCellDef="let task" [class.completed]="task.completed" (click)="openEditDialog(task)" mat-cell>
 
                         {{task.title}}
 
@@ -112,18 +159,23 @@
                     <mat-icon aria-hidden="false">delete</mat-icon>
                 </button>
 
-                        <button mat-icon-button (click)="openEditTaskDialog(task)" class="edit-icon">
+                        <button mat-icon-button (click)="openEditDialog(task)" class="edit-icon">
                 <mat-icon aria-hidden="false">edit</mat-icon>
             </button>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="select">
+
                     <th mat-header-cell *matHeaderCellDef></th>
 
                     <td class="col-select text-right" mat-cell *matCellDef="let task">
-                        <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? onToggleStatus(task) : null" [checked]="task.completed">
+
+                        <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? onToggleCompleted(task) : null" [checked]="!!task.completed">
+
                         </mat-checkbox>
+
+
                     </td>
                 </ng-container>
 

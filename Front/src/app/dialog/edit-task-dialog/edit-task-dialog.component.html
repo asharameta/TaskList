@@ -5,9 +5,9 @@
 
         <mat-label>Title</mat-label>
 
-        <input #inputTitle matInput [(ngModel)]="tmpTitle" (keydown.enter)="onConfirm()">
+        <input [disabled]="task.completed != null && task.completed !== 0" #inputTitle matInput [(ngModel)]="newTitle" (keydown.enter)="onConfirm()">
 
-        <button *ngIf="tmpTitle.trim().length>0" mat-button matSuffix mat-icon-button aria-label="clear" (click)="tmpTitle=''" class="dialog-task-title">
+        <button *ngIf="newTitle && newTitle.trim().length>0" mat-button matSuffix mat-icon-button aria-label="clear" (click)="newTitle=''" class="dialog-task-title">
         <mat-icon>clear</mat-icon> 
     </button>
     </mat-form-field>
@@ -16,9 +16,9 @@
     <mat-form-field>
         <mat-label>Choose category</mat-label>
 
-        <mat-select [(ngModel)]="tmpCategory">
+        <mat-select [(value)]="newCategoryId" [disabled]="task.completed != null && task.completed !== 0">
             <mat-option [value]="null">No category</mat-option>
-            <mat-option *ngFor="let cat of categories" [value]="cat">
+            <mat-option *ngFor="let cat of categories" [value]="cat.id">
                 {{cat.title}}
             </mat-option>
         </mat-select>
@@ -27,25 +27,34 @@
     <mat-form-field>
         <mat-label>Choose priority</mat-label>
 
-        <mat-select [(ngModel)]="tmpPriority">
+        <mat-select [(value)]="newPriorityId" [disabled]="task.completed != null && task.completed !== 0">
             <mat-option [value]="null">No priority</mat-option>
-            <mat-option *ngFor="let pr of priorities" [value]="pr">
+            <mat-option *ngFor="let pr of priorities" [value]="pr.id">
                 {{pr.title}}
             </mat-option>
         </mat-select>
     </mat-form-field>
 
     <mat-form-field>
-        <input matInput placeholder="Specify the due date" #inputDate readonly="true" [matDatepicker]="picker" [(ngModel)]="tmpDate" (click)="picker.open()">
+        <input [disabled]="task.completed != null && task.completed !== 0" matInput placeholder="Specify the due date" #inputDate readonly="true" [matDatepicker]="picker" [(ngModel)]="newDate" (click)="picker.open()">
 
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
 
-        <button *ngIf="inputDate.value.trim().length>0" mat-button matSuffix mat-icon-button aria-label="clear" (click)="tmpDate" class="size25">
+        <button [disabled]="task.completed != null && task.completed !== 0" *ngIf="inputDate.value.trim().length>0" mat-button matSuffix mat-icon-button aria-label="clear" (click)="newDate = null!" class="calendar-clear-icon">
 
             <mat-icon>clear</mat-icon>
             </button>
     </mat-form-field>
+
+    <div class="row">
+        <div class="col-12">
+            <span class="ready-date" [ngClass]="{'disabled': task.completed}" (click)="!task.completed && setToday()">Today</span>
+            <span class="ready-date" [ngClass]="{'disabled': task.completed}" (click)="!task.completed && addDays(1)">Tomorrow</span>
+            <span class="ready-date" [ngClass]="{'disabled': task.completed}" (click)="!task.completed && addDays(2)">Overmorrow</span>
+            <span class="ready-date" [ngClass]="{'disabled': task.completed}" (click)="!task.completed && addDays(7)">Next week</span>
+        </div>
+    </div>
 
 </mat-dialog-content>
 
@@ -59,17 +68,17 @@
         <button mat-raised-button (click)="onCancel()">Cancel</button>
     </div>
 
-    <div class="col-md-7 col-12 text-right">
+    <div class="col-md-7 col-12 text-right" *ngIf="canComplete || canDelete">
 
-        <button mat-raised-button color="green" (click)="completeTask()" *ngIf="!task.completed && canActivateDesactivate()">
+        <button mat-raised-button color="green" (click)="completeTask()" *ngIf="canComplete && task && !task.completed">
         Complete the task
     </button>
 
-        <button mat-raised-button color="green" (click)="activateTask()" *ngIf="task.completed && canActivateDesactivate()">
+        <button mat-raised-button color="green" (click)="activateTask()" *ngIf="canComplete && task && task.completed">
         Activate the task
     </button>
 
-        <button mat-button class="red" *ngIf="canDelete()" (click)="deleteTask()">
+        <button mat-button class="red" *ngIf="canDelete" (click)="deleteTask()">
     Delete the task
     </button>
     </div>

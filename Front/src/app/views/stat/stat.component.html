@@ -2,18 +2,18 @@
     <div class="row">
 
 
-        <app-stat-card [completed]="true" [count1]="completedTasksInCategory" [countTotal]="totalTasksInCategory" class='col-lg-3 col-md-6 col-sm-6' iconName="done" title="Completed taks">
+        <app-stat-card [completed]="true" [count1]="getCompletedCount()" [count2]="getTotal()" class='col-lg-3 col-md-6 col-sm-6' iconName="done" title="Completed taks">
         </app-stat-card>
 
-        <app-stat-card [count1]="uncompletedTasksInCategory" [countTotal]="totalTasksInCategory" class='col-lg-3 col-md-6 col-sm-6' iconName="thumb_down_alt" title="Uncompleted taks">
-        </app-stat-card>
-
-
-        <app-stat-card [completed]="true" [count1]="completedTasksInCategory ? (completedTasksInCategory/totalTasksInCategory | percent) : '0 %'" class='col-lg-3 col-md-6 col-sm-6 completed-card' iconName="poll" title="Percentage of completed tasks">
+        <app-stat-card [count1]="getUncompletedCount()" [count2]="getTotal()" class='col-lg-3 col-md-6 col-sm-6' iconName="thumb_down_alt" title="Uncompleted taks">
         </app-stat-card>
 
 
-        <app-stat-card [count1]="uncompletedTasksInCategory ? (uncompletedTasksInCategory/totalTasksInCategory | percent) : '0 %'" class='col-lg-3 col-md-6 col-sm-6' iconName="thumb_down_alt" title="Percentage of uncompleted tasks">
+        <app-stat-card [completed]="true" [count1]="getCompletedPercent() | percent" class='col-lg-3 col-md-6 col-sm-6 completed-card' iconName="poll" title="% of completed tasks">
+        </app-stat-card>
+
+
+        <app-stat-card [count1]="getUncompletedPercent() | percent" class='col-lg-3 col-md-6 col-sm-6' iconName="thumb_down_alt" title="% of uncompleted tasks">
         </app-stat-card>
 
 

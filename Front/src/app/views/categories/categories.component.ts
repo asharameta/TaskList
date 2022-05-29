@@ -40,7 +40,7 @@ export class CategoriesComponent implements OnInit {
 
   @Input('selectedCategory')
   set setCategory(selectedCategory: Category) {
-      this.selectedCategory = selectedCategory;
+      this.selectedCategory = selectedCategory!;
   }
 
 
@@ -61,7 +61,7 @@ export class CategoriesComponent implements OnInit {
   searchCategory = new EventEmitter<CategorySearchValues>();
 
 
-  selectedCategory: any;
+  selectedCategory!: Category;
 
 
   indexMouseMove!: number;
@@ -78,8 +78,8 @@ export class CategoriesComponent implements OnInit {
       return;
     }
 
-    this.selectedCategory=category;
-    this.selectCategory.emit(this.selectedCategory);
+    this.selectedCategory=category!;
+    this.selectCategory.emit(this.selectedCategory!);
   
   }
 

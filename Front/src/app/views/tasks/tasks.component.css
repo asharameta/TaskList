@@ -61,3 +61,33 @@
     color: #9c27b0 !important;
     font-weight: normal;
 }
+
+.check-icon-notcompleted {
+    font-size: 40px !important;
+    color: #dadada;
+}
+
+.check-icon-completed {
+    font-size: 40px !important;
+    color: rgba(167, 214, 182, 0.89);
+}
+
+.reset-search {
+    margin-top: 10px;
+    font-size: 16px;
+    text-decoration: underline;
+    color: rgba(5, 83, 123, 0.98);
+    text-align: center;
+}
+
+.nopadding-left {
+    padding-left: 0;
+}
+
+.padding-top-20 {
+    padding-top: 10px;
+}
+
+.nowidth {
+    width: 100%;
+}
